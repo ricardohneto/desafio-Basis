@@ -1,14 +1,14 @@
 package br.com.basis.prova.recurso;
 
-import br.com.basis.prova.dominio.Aluno;
 import br.com.basis.prova.dominio.dto.AlunoDTO;
 import br.com.basis.prova.dominio.dto.AlunoDetalhadoDTO;
-import br.com.basis.prova.dominio.dto.AlunoViewDTO;
 import br.com.basis.prova.servico.AlunoServico;
-import br.com.basis.prova.servico.exception.RegraNegocioException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200",maxAge = 3600)
@@ -25,64 +25,30 @@ public class AlunoRecurso {
     }
 
     @PostMapping
-    public ResponseEntity<AlunoDTO> salvar(@RequestBody AlunoDTO aluno) throws RegraNegocioException{
-
-        ifExistsMatricula(aluno.getMatricula());
-
-        this.alunoServico.onlyDisciplinasAtivas(aluno);
-
-        this.alunoServico.salvar(aluno);
-        return new ResponseEntity<>(aluno, HttpStatus.OK);
+    public ResponseEntity<AlunoDTO> salvar(@Valid @RequestBody AlunoDTO alunoDTO) throws URISyntaxException {
+        AlunoDTO result = this.alunoServico.salvar(alunoDTO);
+        return ResponseEntity.created(new URI(API_ALUNOS + result.getId())).body(result);
     }
 
-    @PutMapping("/{matricula}")
-    public ResponseEntity<?> editar(@RequestBody AlunoDTO alunoDto,
-                                    @PathVariable("matricula") String matricula) {
-
-        ifExistsMatricula(alunoDto.getMatricula());
-
-        this.alunoServico.onlyDisciplinasAtivas(alunoDto);
-
-        alunoDto.setMatricula(matricula);
-        this.alunoServico.salvar(alunoDto);
-        return new ResponseEntity<>(alunoDto, HttpStatus.OK);
+    @PutMapping
+    public ResponseEntity<AlunoDTO> editar(@Valid @RequestBody AlunoDTO alunoDTO) throws URISyntaxException {
+        AlunoDTO result = alunoServico.salvar(alunoDTO);
+        return ResponseEntity.created(new URI(API_ALUNOS + result.getId())).body(result);
     }
 
-    @DeleteMapping("/{matricula}")
-    public ResponseEntity<?> excluir(@PathVariable("matricula") String matricula) {
-
-        ifNotExistsMatricula(matricula);
-
-        if(this.alunoServico.excluir(matricula))
-            return new ResponseEntity<>(HttpStatus.OK);
-        throw new RegraNegocioException("Aluno Vinculado a Disciplinas");
-
-    }
-
-    @GetMapping("/{matricula}")
-    public AlunoDTO consultarUm(@PathVariable("matricula") String matricula){
-        return this.alunoServico.consultaUm(matricula);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable("id") Integer id) {
+        alunoServico.excluir(id);
+        return ResponseEntity.status(200).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<AlunoViewDTO>> consultar() {
+    public ResponseEntity<List<AlunoDTO>> consultar() {
         return ResponseEntity.ok(this.alunoServico.consultar());
     }
 
     @GetMapping("/detalhes")
     public ResponseEntity<List<AlunoDetalhadoDTO>> detalhar() {
         return ResponseEntity.ok(this.alunoServico.detalhar());
-    }
-
-    // privates p/ tratamento de erros
-
-    private void ifExistsMatricula(String matricula){
-        if(this.alunoServico.existeMatricula(matricula))
-            throw new RegraNegocioException("Está Matricula Já Existe");
-    }
-
-    private void ifNotExistsMatricula(String matricula){
-        if(!this.alunoServico.existeMatricula(matricula))
-            throw new RegraNegocioException("Está Matricula Não Existe");
     }
 }

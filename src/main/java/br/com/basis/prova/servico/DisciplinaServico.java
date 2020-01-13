@@ -58,7 +58,7 @@ public class DisciplinaServico {
 
         Disciplina disciplina = this.disciplinaMapper.toEntity(disciplinaDto);
         disciplina.setProfessor(this.professorServico.addProfessor(disciplinaDto));
-        disciplina.getAlunos().add(this.alunoServico.addAluno());
+        //disciplina.getAlunos().add(this.alunoServico.addAluno());
 
         return this.disciplinaRepositorio.save(disciplina);
     }

@@ -5,10 +5,9 @@ import br.com.basis.prova.dominio.Disciplina;
 import br.com.basis.prova.dominio.dto.*;
 import br.com.basis.prova.repositorio.AlunoRepositorio;
 import br.com.basis.prova.repositorio.DisciplinaRepositorio;
+import br.com.basis.prova.servico.exception.RegraNegocioException;
 import br.com.basis.prova.servico.mapper.AlunoDetalhadoMapper;
 import br.com.basis.prova.servico.mapper.AlunoMapper;
-import br.com.basis.prova.servico.mapper.AlunoViewMapper;
-import br.com.basis.prova.servico.mapper.DisciplinaViewMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,111 +21,81 @@ public class AlunoServico {
 
     private AlunoMapper alunoMapper;
     private AlunoDetalhadoMapper alunoDetalhadoMapper;
-    private AlunoViewMapper alunoViewMapper;
     private AlunoRepositorio alunoRepositorio;
     private DisciplinaRepositorio disciplinaRepositorio;
 
     public AlunoServico(AlunoMapper alunoMapper,
                         AlunoDetalhadoMapper alunoDetalhadoMapper,
-                        AlunoViewMapper alunoViewMapper,
                         AlunoRepositorio alunoRepositorio,
                         DisciplinaRepositorio disciplinaRepositorio) {
         this.alunoMapper = alunoMapper;
-        this.alunoViewMapper = alunoViewMapper;
         this.alunoDetalhadoMapper = alunoDetalhadoMapper;
         this.alunoRepositorio = alunoRepositorio;
         this.disciplinaRepositorio = disciplinaRepositorio;
     }
 
-    public Aluno salvar(AlunoDTO alunoDto) {
-        return this.alunoRepositorio.save(this.alunoMapper.toEntity(alunoDto));
+    public AlunoDTO salvar(AlunoDTO alunoDto) {
+        Aluno aluno = this.alunoMapper.toEntity(alunoDto);
+
+        if(verificarCPF(aluno))
+            throw new RegraNegocioException("CPF já Existe");
+
+        if(verificarMatricula(aluno))
+            throw new RegraNegocioException("Matricula já Existe");
+
+        return this.alunoMapper.toDto(aluno);
     }
 
-    public boolean excluir(String matricula) {
-        if(this.alunoRepositorio.findByMatricula(matricula).getDisciplinas().isEmpty()
-                || this.alunoRepositorio.findByMatricula(matricula).getDisciplinas() == null){
-            this.alunoRepositorio.delete(this.alunoRepositorio.findByMatricula(matricula));
-            return true;
-        }
-        return false;
+    private boolean verificarCPF(Aluno aluno){
+        Aluno alunoCpf = this.alunoRepositorio.findByCpf(aluno.getCpf());
+        return !(alunoCpf == null || alunoCpf.getId().equals(aluno.getId()));
     }
 
-    public AlunoDTO consultaUm(String matricula) {
-        return this.alunoMapper.toDto(this.alunoRepositorio.findByMatricula(matricula));
+    private boolean verificarMatricula(Aluno aluno){
+        Aluno alunoMatricula = this.alunoRepositorio.findByMatricula(aluno.getMatricula());
+        return !(alunoMatricula == null || alunoMatricula.getId().equals(aluno.getId()));
     }
 
-    public List<AlunoViewDTO> consultar() {
-        return this.setAlunoToDto();
+    public void excluir(Integer id) {
+        Aluno aluno = this.alunoRepositorio.findById(id).orElseThrow(() ->
+                new RegraNegocioException("Identificador do Aluno Não Encontrado!"));
+
+        if (!(disciplinaRepositorio.findAllByAtivaAndAlunos(1, aluno).isEmpty()))
+            throw new RegraNegocioException("Aluno matriculado em disciplinas");
+
+        this.alunoRepositorio.delete(aluno);
+    }
+
+    public List<AlunoDTO> consultar() {
+        List<AlunoDTO> alunos = this.alunoMapper.toDto(this.alunoRepositorio.findAll());
+        preencherIdades(alunos);
+        return alunos;
+    }
+
+    private void preencherIdades(List<AlunoDTO> alunos) {
+        alunos.forEach(alunoDTO -> {
+            alunoDTO.setIdade(LocalDate.now().getYear() - alunoDTO.getDataNascimento().getYear());
+        });
     }
 
     public List<AlunoDetalhadoDTO> detalhar() {
-        return this.setAlunoDetalhadoToDto();
+        List<AlunoDetalhadoDTO> alunos = this.alunoDetalhadoMapper.toDto(this.alunoRepositorio.findAll());
+        preencherIdadesAndDisciplinas(alunos);
+        return alunos;
     }
 
-    // metodos para transformar para DTO e atualizar a idade
-
-    public List<AlunoViewDTO> setAlunoToDto(){
-        List<AlunoViewDTO> alunosDto = this.alunoViewMapper.toDto(this.alunoRepositorio.findAll());
-
-        alunosDto.forEach(alunoDto -> {
-            alunoDto.setIdade(LocalDate.now().getYear() - alunoDto.getDataNascimento().getYear());
-        });
-
-        return alunosDto;
-    }
-
-    public List<AlunoDetalhadoDTO> setAlunoDetalhadoToDto(){
-        List<AlunoDetalhadoDTO> alunosDetalhadosDto = this.alunoDetalhadoMapper.toDto(this.alunoRepositorio.findAll());
-
-        for (AlunoDetalhadoDTO alunoDetalhadoDTO : alunosDetalhadosDto) {
-            String nomeDisciplinas = "";
-            alunoDetalhadoDTO.setIdade(LocalDate.now().getYear() - alunoDetalhadoDTO.getDataNascimento().getYear());
-
-            Aluno aluno = this.alunoDetalhadoMapper.toEntity(alunoDetalhadoDTO);
-            List<Disciplina> disciplinas = aluno.getDisciplinas();
-            for (Disciplina disciplina : disciplinas) {
-                if(disciplina.equals(disciplinas.get(disciplinas.size()-1)))
-                    nomeDisciplinas += disciplina.getNome();
-                else
-                    nomeDisciplinas += disciplina.getNome() + ", ";
+    private void preencherIdadesAndDisciplinas(List<AlunoDetalhadoDTO> alunos) {
+        alunos.forEach(alunoDetalhado -> {
+            List<String> nomeDisciplinas = new ArrayList<String>();
+            alunoDetalhado.setIdade(LocalDate.now().getYear() - alunoDetalhado.getDataNascimento().getYear());
+            List<DisciplinaDTO> disciplinasDTO = alunoDetalhado.getDisciplinas();
+            for (DisciplinaDTO disciplinaDTO : disciplinasDTO) {
+                if (disciplinaDTO.getAtiva() == 1)
+                    nomeDisciplinas.add(disciplinaDTO.getNome());
             }
-            alunoDetalhadoDTO.setNomeDisciplinas(nomeDisciplinas);
-            if(nomeDisciplinas.equals(""))
-                alunoDetalhadoDTO.setNomeDisciplinas("Sem Disciplinas");
-        }
-
-        return alunosDetalhadosDto;
-    }
-
-    // aux para tratamento de erros
-
-    public boolean existeMatricula(String matricula){
-        if(this.alunoRepositorio.findByMatricula(matricula) != null)
-            return true;
-        return false;
-    }
-
-    // verificar se a materia está ativa
-
-    public void onlyDisciplinasAtivas(AlunoDTO alunoDto){
-        Aluno aluno = this.alunoMapper.toEntity(alunoDto);
-
-        List<Disciplina> disciplinas = aluno.getDisciplinas();
-        if (disciplinas == null)
-            disciplinas = new ArrayList<>();
-        List<Disciplina> disciplinasAtivas = new ArrayList<>();
-
-        disciplinas.forEach(disciplina -> {
-            if(disciplina.getAtiva() == 1)
-                disciplinasAtivas.add(disciplina);
+            alunoDetalhado.setNomeDisciplinas(nomeDisciplinas);
         });
-        aluno.setDisciplinas(disciplinasAtivas);
     }
 
-    // metodo p/ disciplina servico
-
-    public Aluno addAluno() {
-        return this.alunoRepositorio.findTopByOrderByIdDesc();
-    }
 
 }

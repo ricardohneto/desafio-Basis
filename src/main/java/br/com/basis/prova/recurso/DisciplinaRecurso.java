@@ -1,20 +1,13 @@
 package br.com.basis.prova.recurso;
 
-import br.com.basis.prova.dominio.Aluno;
-import br.com.basis.prova.dominio.Disciplina;
-import br.com.basis.prova.dominio.dto.AlunoDTO;
 import br.com.basis.prova.dominio.dto.DisciplinaDTO;
 import br.com.basis.prova.dominio.dto.DisciplinaDetalhadaDTO;
-import br.com.basis.prova.dominio.dto.DisciplinaViewDTO;
 import br.com.basis.prova.servico.DisciplinaServico;
 import br.com.basis.prova.servico.exception.RegraNegocioException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200",maxAge = 3600)

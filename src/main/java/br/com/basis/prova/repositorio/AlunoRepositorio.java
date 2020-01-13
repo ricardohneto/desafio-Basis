@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface AlunoRepositorio extends JpaRepository<Aluno, Integer>, JpaSpecificationExecutor<Aluno> {
 
-    Aluno findByMatricula(String matricula);
+    Aluno findByCpf(String cpf);
 
-    Aluno findTopByOrderByIdDesc();
+    Aluno findByMatricula(String matricula);
 }

@@ -1,5 +1,6 @@
 package br.com.basis.prova.repositorio;
 
+import br.com.basis.prova.dominio.Aluno;
 import br.com.basis.prova.dominio.Disciplina;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,4 +14,5 @@ public interface DisciplinaRepositorio extends JpaRepository<Disciplina, Integer
 
     Optional<Disciplina> findById(Integer id);
 
+    List<Disciplina> findAllByAtivaAndAlunos(Integer ativa, Aluno aluno);
 }

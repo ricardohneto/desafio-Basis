@@ -16,13 +16,13 @@ import java.util.List;
 @Setter
 public class AlunoDetalhadoDTO {
 
+    private Integer id;
     private String nome;
+    private String cpf;
     private String matricula;
-    private Integer idade;
-    @JsonIgnore
     private LocalDate dataNascimento;
-    private String nomeDisciplinas;
-    @JsonIgnore
-    private List<DisciplinaDTO> disciplinas;
+    private Integer idade;
+    private List<DisciplinaDTO> disciplinas = new ArrayList<>();
+    private List<String> nomeDisciplinas = new ArrayList<>();
 
 }
