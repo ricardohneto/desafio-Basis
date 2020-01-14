@@ -16,7 +16,6 @@ public class DisciplinaDetalhadaDTO {
     private String nome;
     private Integer cargaHoraria;
     private String nomeProfessor;
-    @JsonIgnore
     private String idProfessor;
 
 }

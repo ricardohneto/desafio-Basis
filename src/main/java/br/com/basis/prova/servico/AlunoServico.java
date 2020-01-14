@@ -38,12 +38,12 @@ public class AlunoServico {
         Aluno aluno = this.alunoMapper.toEntity(alunoDto);
 
         if(verificarCPF(aluno))
-            throw new RegraNegocioException("CPF já Existe");
+            throw new RegraNegocioException("CPF Já Existe");
 
         if(verificarMatricula(aluno))
-            throw new RegraNegocioException("Matricula já Existe");
+            throw new RegraNegocioException("Matricula Já Existe");
 
-        return this.alunoMapper.toDto(aluno);
+        return this.alunoMapper.toDto(this.alunoRepositorio.save(aluno));
     }
 
     private boolean verificarCPF(Aluno aluno){
@@ -61,7 +61,7 @@ public class AlunoServico {
                 new RegraNegocioException("Identificador do Aluno Não Encontrado!"));
 
         if (!(disciplinaRepositorio.findAllByAtivaAndAlunos(1, aluno).isEmpty()))
-            throw new RegraNegocioException("Aluno matriculado em disciplinas");
+            throw new RegraNegocioException("Aluno Matriculado em Disciplinas");
 
         this.alunoRepositorio.delete(aluno);
     }
@@ -86,7 +86,7 @@ public class AlunoServico {
 
     private void preencherIdadesAndDisciplinas(List<AlunoDetalhadoDTO> alunos) {
         alunos.forEach(alunoDetalhado -> {
-            List<String> nomeDisciplinas = new ArrayList<String>();
+            List<String> nomeDisciplinas = new ArrayList<>();
             alunoDetalhado.setIdade(LocalDate.now().getYear() - alunoDetalhado.getDataNascimento().getYear());
             List<DisciplinaDTO> disciplinasDTO = alunoDetalhado.getDisciplinas();
             for (DisciplinaDTO disciplinaDTO : disciplinasDTO) {

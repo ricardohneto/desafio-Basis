@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +20,21 @@ import java.util.List;
 public class DisciplinaDTO {
 
     private Integer id;
+
+    @NotNull
+    @Size(min = 1, max = 50, message = "Nome Inválido")
     private String nome;
+
+    @NotNull
+    @Size(min = 1, max = 200, message = "Descrição Inválida")
     private String descricao;
+
+    @NotNull
     private Integer cargaHoraria;
+
     private Integer ativa;
+
+    @NotNull
     private String idProfessor;
-    @JsonIgnore
-    private List<AlunoDTO> alunos = new ArrayList<>();
 
 }

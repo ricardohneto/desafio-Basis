@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProfessorRepositorio extends JpaRepository<Professor, Integer>, JpaSpecificationExecutor<Professor> {
 
-    boolean existsByMatricula(String matricula);
-
     Professor findByMatricula(String matricula);
 
 }

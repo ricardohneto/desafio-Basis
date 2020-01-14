@@ -1,19 +1,15 @@
 package br.com.basis.prova.recurso;
 
 
-import br.com.basis.prova.dominio.Aluno;
-import br.com.basis.prova.dominio.Professor;
-import br.com.basis.prova.dominio.dto.AlunoDTO;
+
 import br.com.basis.prova.dominio.dto.ProfessorDTO;
 import br.com.basis.prova.dominio.dto.ProfessorDetalhadoDTO;
-import br.com.basis.prova.dominio.dto.ProfessorViewDTO;
 import br.com.basis.prova.servico.ProfessorServico;
-import br.com.basis.prova.servico.exception.RegraNegocioException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -33,61 +29,31 @@ public class ProfessorRecurso {
     }
 
     @PostMapping
-    public ResponseEntity<?> salvar(@RequestBody ProfessorDTO professorDto) {
-
-        ifExistsMatricula(professorDto.getMatricula());
-
-        professorServico.salvar(professorDto);
-        return new ResponseEntity<>(professorDto, HttpStatus.OK);
+    public ResponseEntity<ProfessorDTO> salvar(@Valid @RequestBody ProfessorDTO professorDto) throws URISyntaxException {
+        ProfessorDTO result = this.professorServico.salvar(professorDto);
+        return ResponseEntity.created(new URI(API_PROFESSORES + result.getId())).body(result);
     }
 
-    @PutMapping("/{matricula}")
-    public ResponseEntity<?> editar(@RequestBody ProfessorDTO professorDto,
-                                    @PathVariable("matricula") String matricula) {
-
-        ifExistsMatricula(professorDto.getMatricula());
-
-        professorDto.setMatricula(matricula);
-        this.professorServico.salvar(professorDto);
-        return new ResponseEntity<>(professorDto, HttpStatus.OK);
+    @PutMapping
+    public ResponseEntity<?> editar(@Valid @RequestBody ProfessorDTO professorDto) throws URISyntaxException{
+        ProfessorDTO result = this.professorServico.salvar(professorDto);
+        return ResponseEntity.created(new URI(API_PROFESSORES + result.getId())).body(result);
     }
 
-    @DeleteMapping("/{matricula}")
-    public ResponseEntity<?> excluir(@PathVariable("matricula") String matricula) {
-
-        ifNotExistsMatricula(matricula);
-
-        if(this.professorServico.excluir(matricula))
-            return new ResponseEntity<>(HttpStatus.OK);
-        throw new RegraNegocioException("Professor Responsavel por Disciplinas");
-
-    }
-
-    @GetMapping("/{matricula}")
-    public ProfessorDTO consultarUm(@PathVariable("matricula") String matricula){
-        return this.professorServico.consultaUm(matricula);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluir(@PathVariable("id") Integer id) {
+        this.professorServico.excluir(id);
+        return ResponseEntity.status(200).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<ProfessorViewDTO>> consultar() {
+    public ResponseEntity<List<ProfessorDTO>> consultar() {
         return ResponseEntity.ok(professorServico.consultar());
     }
 
     @GetMapping("/detalhes")
     public ResponseEntity<List<ProfessorDetalhadoDTO>> detalhar() {
         return ResponseEntity.ok(professorServico.detalhar());
-    }
-
-    // privates p/ tratamento de erros
-
-    private void ifExistsMatricula(String matricula){
-        if(this.professorServico.existeMatricula(matricula))
-            throw new RegraNegocioException("Está Matricula Já Existe");
-    }
-
-    private void ifNotExistsMatricula(String matricula){
-        if(!this.professorServico.existeMatricula(matricula))
-            throw new RegraNegocioException("Está Matricula Não Existe");
     }
 
 }
