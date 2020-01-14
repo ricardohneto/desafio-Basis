@@ -56,9 +56,11 @@ public class AlunoServico {
         return !(alunoMatricula == null || alunoMatricula.getId().equals(aluno.getId()));
     }
 
-    public void excluir(Integer id) {
-        Aluno aluno = this.alunoRepositorio.findById(id).orElseThrow(() ->
-                new RegraNegocioException("Identificador do Aluno Não Encontrado!"));
+    public void excluir(String matricula) {
+        Aluno aluno = this.alunoRepositorio.findByMatricula(matricula);
+
+        if(aluno == null)
+            throw new RegraNegocioException("Matricula Não Encontrada");
 
         if (!(disciplinaRepositorio.findAllByAtivaAndAlunos(1, aluno).isEmpty()))
             throw new RegraNegocioException("Aluno Matriculado em Disciplinas");

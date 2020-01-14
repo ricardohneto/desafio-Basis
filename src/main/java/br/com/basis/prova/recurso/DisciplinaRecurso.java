@@ -39,10 +39,11 @@ public class DisciplinaRecurso {
         return ResponseEntity.created(new URI(API_DISCIPLINAS + result.getId())).body(result);
     }
 
-    @PutMapping("/matricular/{id}")
-    public ResponseEntity<?> matricular(@PathVariable("id") Integer id) {
+    @PutMapping("/matricular")
+    public ResponseEntity<?> matricular(@RequestBody DisciplinaDTO disciplinaDTO,
+                                        @PathVariable("matricula") String matricula) {
 
-        this.disciplinaServico.matricular(id);
+        this.disciplinaServico.matricular(disciplinaDTO, matricula);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

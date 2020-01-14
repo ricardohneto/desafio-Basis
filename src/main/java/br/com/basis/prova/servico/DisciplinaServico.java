@@ -1,5 +1,6 @@
 package br.com.basis.prova.servico;
 
+import br.com.basis.prova.dominio.Aluno;
 import br.com.basis.prova.dominio.Disciplina;
 import br.com.basis.prova.dominio.Professor;
 import br.com.basis.prova.dominio.dto.*;
@@ -44,12 +45,16 @@ public class DisciplinaServico {
         return this.disciplinaMapper.toDto(this.disciplinaRepositorio.save(disciplina));
     }
 
-    public Disciplina matricular(Integer id) {
-        DisciplinaDTO disciplinaDto = this.disciplinaMapper.toDto(this.disciplinaRepositorio.findById(id).get());
-
+    public Disciplina matricular(DisciplinaDTO disciplinaDto, String matricula) {
         Disciplina disciplina = this.disciplinaMapper.toEntity(disciplinaDto);
         disciplina.setProfessor(this.professorServico.addProfessor(disciplinaDto));
-        //disciplina.getAlunos().add(this.alunoServico.addAluno());
+
+        Aluno aluno = this.alunoRepositorio.findByMatricula(matricula);
+
+        if (aluno == null)
+            throw new RegraNegocioException("Matricula Não Encontrada");
+
+        disciplina.getAlunos().add(aluno);
 
         return this.disciplinaRepositorio.save(disciplina);
     }
@@ -58,9 +63,12 @@ public class DisciplinaServico {
         Disciplina disciplina = this.disciplinaRepositorio.findById(id).orElseThrow(() ->
                 new RegraNegocioException("Identificador da Disciplina Não Encontrado"));
 
-        if(!(this.alunoRepositorio.findByDisciplinas(disciplina) == null)
-                || this.alunoRepositorio.findByDisciplinas(disciplina).isEmpty())
+        if(!(this.alunoRepositorio.findByDisciplinas(disciplina).isEmpty()))
             throw new RegraNegocioException("Disciplina Com Alunos Matriculados");
+
+        // como fazer de forma melhor?
+        disciplina.setProfessor(null);
+        //
 
         this.disciplinaRepositorio.delete(disciplina);
     }

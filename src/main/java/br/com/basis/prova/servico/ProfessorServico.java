@@ -49,9 +49,11 @@ public class ProfessorServico {
         return !(professorMatricula == null || professorMatricula.getId().equals(professor.getId()));
     }
 
-    public void excluir(Integer id) {
-        Professor professor = this.professorRepositorio.findById(id).orElseThrow(() ->
-                new RegraNegocioException("Identificador do Professor Não Encontrado"));
+    public void excluir(String matricula) {
+        Professor professor = this.professorRepositorio.findByMatricula(matricula);
+
+        if(professor == null)
+            throw new RegraNegocioException("Matricula Não Encontrada");
 
         if (!(this.disciplinaRepositorio.findByProfessor(professor) == null))
             throw new RegraNegocioException("Professor Ministrando Disciplina(s)");

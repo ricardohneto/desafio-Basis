@@ -40,9 +40,9 @@ public class ProfessorRecurso {
         return ResponseEntity.created(new URI(API_PROFESSORES + result.getId())).body(result);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluir(@PathVariable("id") Integer id) {
-        this.professorServico.excluir(id);
+    @DeleteMapping("/{matricula}")
+    public ResponseEntity<?> excluir(@PathVariable("matricula") String matricula) {
+        this.professorServico.excluir(matricula);
         return ResponseEntity.status(200).build();
     }
 
