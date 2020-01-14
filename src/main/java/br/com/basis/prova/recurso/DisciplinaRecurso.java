@@ -39,7 +39,7 @@ public class DisciplinaRecurso {
         return ResponseEntity.created(new URI(API_DISCIPLINAS + result.getId())).body(result);
     }
 
-    @PutMapping("/matricular")
+    @PutMapping("/matricular/{matricula}")
     public ResponseEntity<?> matricular(@RequestBody DisciplinaDTO disciplinaDTO,
                                         @PathVariable("matricula") String matricula) {
 

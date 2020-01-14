@@ -12,6 +12,7 @@ import br.com.basis.prova.servico.mapper.DisciplinaMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,13 +47,20 @@ public class DisciplinaServico {
     }
 
     public Disciplina matricular(DisciplinaDTO disciplinaDto, String matricula) {
-        Disciplina disciplina = this.disciplinaMapper.toEntity(disciplinaDto);
+        Disciplina disciplina = this.disciplinaRepositorio.findById(disciplinaDto.getId()).get();
         disciplina.setProfessor(this.professorServico.addProfessor(disciplinaDto));
 
         Aluno aluno = this.alunoRepositorio.findByMatricula(matricula);
 
+        // tratar caso a matricula seja repetida
+
         if (aluno == null)
             throw new RegraNegocioException("Matricula Não Encontrada");
+
+
+        if(disciplina.getAlunos() == null) {
+            disciplina.setAlunos(new ArrayList<>());
+        }
 
         disciplina.getAlunos().add(aluno);
 

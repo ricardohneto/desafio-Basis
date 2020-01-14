@@ -42,7 +42,7 @@ public class Disciplina {
 //    @JsonBackReference
 //    @ManyToMany(mappedBy = "disciplinas", fetch = FetchType.LAZY)
 //    @JsonManagedReference
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ALUNO_DISCIPLINA",
             joinColumns = @JoinColumn(name = "ID_DISCIPLINA", referencedColumnName = "ID"),
             inverseJoinColumns= @JoinColumn(name = "ID_ALUNO", referencedColumnName = "ID"))
