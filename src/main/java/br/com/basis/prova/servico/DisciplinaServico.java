@@ -52,14 +52,15 @@ public class DisciplinaServico {
 
         Aluno aluno = this.alunoRepositorio.findByMatricula(matricula);
 
-        // tratar caso a matricula seja repetida
-
         if (aluno == null)
             throw new RegraNegocioException("Matricula Não Encontrada");
 
-
         if(disciplina.getAlunos() == null) {
             disciplina.setAlunos(new ArrayList<>());
+        }
+
+        if(disciplina.getAlunos().contains(aluno)){
+            throw new RegraNegocioException("Já Matriculado Nessa Disciplina");
         }
 
         disciplina.getAlunos().add(aluno);
