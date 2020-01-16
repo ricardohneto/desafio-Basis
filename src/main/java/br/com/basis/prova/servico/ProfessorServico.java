@@ -23,16 +23,13 @@ public class ProfessorServico {
     private ProfessorRepositorio professorRepositorio;
     private ProfessorMapper professorMapper;
     private ProfessorDetalhadoMapper professorDetalhadoMapper;
-    private DisciplinaRepositorio disciplinaRepositorio;
 
     public ProfessorServico(ProfessorMapper professorMapper,
                             ProfessorRepositorio professorRepositorio,
-                            ProfessorDetalhadoMapper professorDetalhadoMapper,
-                            DisciplinaRepositorio disciplinaRepositorio) {
+                            ProfessorDetalhadoMapper professorDetalhadoMapper) {
         this.professorMapper = professorMapper;
         this.professorDetalhadoMapper = professorDetalhadoMapper;
         this.professorRepositorio = professorRepositorio;
-        this.disciplinaRepositorio = disciplinaRepositorio;
     }
 
     public ProfessorDTO salvar(ProfessorDTO professorDto) {
@@ -55,7 +52,7 @@ public class ProfessorServico {
         if(professor == null)
             throw new RegraNegocioException("Matricula Não Encontrada");
 
-        if (!(this.disciplinaRepositorio.findByProfessor(professor) == null))
+        if (!(professor.getDisciplinas() == null || professor.getDisciplinas().isEmpty()))
             throw new RegraNegocioException("Professor Ministrando Disciplina(s)");
 
         this.professorRepositorio.delete(professor);
