@@ -68,4 +68,20 @@
         </sql>
     </changeSet>
 
+    <changeSet id="5" author="ricardo.neto">
+        <sql>
+
+            CREATE TABLE AVALIACAO (
+                ID_ALUNO INT NOT NULL,
+                ID_DISCIPLINA INT NOT NULL,
+                NOTA DOUBLE NOT NULL,
+                DATA_AVALIACAO date NOT NULL,
+                CONSTRAINT FK_AVAL_ALUNO_ID FOREIGN KEY ( ID_ALUNO ) REFERENCES ALUNO ( ID ),
+                CONSTRAINT FK_AVAL_DISCIPLINA_ID FOREIGN KEY ( ID_DISCIPLINA ) REFERENCES DISCIPLINA( ID ),
+                CONSTRAINT PK_AVALIACAO_ID PRIMARY KEY (ID_ALUNO, ID_DISCIPLINA)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
