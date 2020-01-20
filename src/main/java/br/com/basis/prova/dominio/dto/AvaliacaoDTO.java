@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -18,15 +20,16 @@ public class AvaliacaoDTO {
     @NotNull
     private Integer idAluno;
 
-    private Aluno aluno;
+    private String nomeAluno;
 
     @NotNull
     private Integer idDisciplina;
 
-    private Disciplina disciplina;
+    private String nomeDisciplina;
 
     @NotNull
-    @Size(min = 0, max = 10, message = "Nota Inválida")
+    @Min(0)
+    @Max(10)
     private Double nota;
 
     @NotNull

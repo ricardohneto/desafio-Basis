@@ -1,7 +1,7 @@
 package br.com.basis.prova.servico;
 
 import br.com.basis.prova.dominio.Aluno;
-import br.com.basis.prova.dominio.Disciplina;
+import br.com.basis.prova.dominio.Professor;
 import br.com.basis.prova.dominio.dto.*;
 import br.com.basis.prova.repositorio.AlunoRepositorio;
 import br.com.basis.prova.repositorio.DisciplinaRepositorio;
@@ -99,5 +99,13 @@ public class AlunoServico {
         });
     }
 
+    // metodo para classe AvaliacaoServico
+
+    protected Aluno addAluno(Integer id) {
+        Aluno aluno = this.alunoRepositorio.findById(id).orElseThrow(() ->
+                new RegraNegocioException("Aluno Não Encontrado"));
+
+        return aluno;
+    }
 
 }

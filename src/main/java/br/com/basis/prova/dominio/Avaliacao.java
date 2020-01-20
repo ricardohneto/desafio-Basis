@@ -30,7 +30,7 @@ public class Avaliacao{
     @Column(name = "NOTA", nullable = false)
     private Double nota;
 
-    @Column(name = "DATA_NASCIMENTO", nullable = false)
+    @Column(name = "DATA_AVALIACAO", nullable = false)
     private LocalDate dataAplicacao;
 
 

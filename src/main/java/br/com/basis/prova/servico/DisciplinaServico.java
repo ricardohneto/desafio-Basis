@@ -98,4 +98,12 @@ public class DisciplinaServico {
         }
     }
 
+    // metodo auxiliar para AvaliacaoServico
+
+    protected Disciplina addDisciplina(Integer id) {
+        Disciplina disciplina = this.disciplinaRepositorio.findById(id).orElseThrow(() ->
+                new RegraNegocioException("Disciplina não Encontrada"));
+
+        return disciplina;
+    }
 }
