@@ -24,7 +24,13 @@ public class AvaliacaoRecurso {
     public AvaliacaoRecurso(AvaliacaoServico avaliacaoServico) { this.avaliacaoServico = avaliacaoServico; }
 
     @PostMapping
-    public ResponseEntity<AvaliacaoDTO> salvar(@Valid @RequestBody AvaliacaoDTO avaliacaoDTO) throws URISyntaxException {
+    public ResponseEntity<AvaliacaoDTO> salvar(@Valid @RequestBody AvaliacaoDTO avaliacaoDTO) {
+        AvaliacaoDTO result = this.avaliacaoServico.salvar(avaliacaoDTO);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping
+    public ResponseEntity<AvaliacaoDTO> editar (@Valid @RequestBody AvaliacaoDTO avaliacaoDTO) {
         AvaliacaoDTO result = this.avaliacaoServico.salvar(avaliacaoDTO);
         return ResponseEntity.ok(result);
     }
