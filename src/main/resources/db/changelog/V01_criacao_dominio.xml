@@ -8,7 +8,7 @@
     <property name="now" value="now()" dbms="h2"/>
     <property name="now" value="sysdate" dbms="oracle"/>
 
-    <changeSet id="1" author="chrysthian.moizes">
+    <changeSet id="1" author="ricardo.neto">
        <sql>
 
            CREATE TABLE ALUNO (
@@ -23,7 +23,7 @@
        </sql>
     </changeSet>
 
-    <changeSet id="2" author="diego.tesch">
+    <changeSet id="2" author="ricardo.neto">
         <sql>
 
             CREATE TABLE PROFESSOR (
@@ -39,7 +39,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="3" author="diego.tesch">
+    <changeSet id="3" author="ricardo.neto">
         <sql>
             CREATE TABLE DISCIPLINA (
                 ID INT NOT NULL AUTO_INCREMENT COMMENT 'Chave primaria da tabela DISCIPLINA',
@@ -55,7 +55,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="4" author="chrysthian.moizes">
+    <changeSet id="4" author="ricardo.neto">
         <sql>
 
             CREATE TABLE ALUNO_DISCIPLINA (
